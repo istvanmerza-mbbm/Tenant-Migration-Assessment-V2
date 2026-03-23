@@ -230,7 +230,7 @@ foreach ($teamgroup in $TeamGroups) {
         $teamgroup | Add-Member -MemberType NoteProperty -Name "DocumentLibraries" -Value $TeamDetails.count -Force
         $teamgroup | Add-Member -MemberType NoteProperty -Name "DataSize" -Value ($TeamDetails.quota.used | measure-object -sum).sum -Force
         ##NOTE: Change for Non-English Tenants
-        $teamgroup | Add-Member -MemberType NoteProperty -Name "URL" -Value $TeamDetails[0].webUrl.replace("/Shared%20Documents", "") -Force
+        $teamgroup | Add-Member -MemberType NoteProperty -Name "URL" -Value $TeamDetails[0].webUrl.replace("/Shared%20Documents", "").replace("/Freigegebene%20Dokumente","") -Force
     }
     Catch {
         #write-host "Unable to get document libraries for $($teamgroup.displayname) - $($teamgroup.id)" -ForegroundColor Red
@@ -418,10 +418,10 @@ Remove-Item "$($FilePath)\SharePointReport.csv"
 $SharePoint | Add-Member -MemberType NoteProperty -Name "TeamID" -Value "" -force
 foreach ($Site in $Sharepoint) {
     ##NOTE: Change for Non-English Tenants
-    $DriveLookup = ((Get-MgSiteDrive -siteId $Site.'Site Id' -ErrorAction SilentlyContinue | ? { $_.name -eq "Documents" }).weburl)
+    $DriveLookup = ((Get-MgSiteDrive -siteId $Site.'Site Id' -ErrorAction SilentlyContinue | ? { $_.name -eq "Documents" -or $_.name -eq "Dokumente" }).weburl)
     If ($DriveLookup) {
         ##NOTE: Change for Non-English Tenants
-        $Site.'Site URL' = $DriveLookup.replace('/Shared%20Documents', '')
+        $Site.'Site URL' = $DriveLookup.replace('/Shared%20Documents', '').replace('/Freigegebene%20Dokumente','')
     }
     $Site.TeamID = ($TeamGroups | ? { $_.url -contains $site.'site url' }).id
 
@@ -499,7 +499,7 @@ If ($IncludeDocumentLibraries) {
     $LibraryOutput = @()
     foreach ($site in $sites) {
         ##NOTE: Change for Non-English Tenants
-        [array]$Drives = Get-MgSiteDrive -SiteId $site.id | ? { $_.Name -eq "Documents" }
+        [array]$Drives = Get-MgSiteDrive -SiteId $site.id | ? { $_.Name -eq "Documents" -or $_.Name -eq "Dokumente" }
         foreach ($drive in $drives) {
             $LibraryObject = [PSCustomObject]@{
                 LibraryID    = $Drive.id
