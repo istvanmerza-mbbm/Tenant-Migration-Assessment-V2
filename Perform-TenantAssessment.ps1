@@ -172,7 +172,7 @@ UpdateProgress
 $ProgressTracker++
 
 ##Get Teams details
-$TeamGroups = $Groups | ? { ($_.grouptypes -Contains "unified") -and ($_.additionalproperties.resourceProvisioningOptions -contains "Team") }
+$TeamGroups = $Groups | ? { ($_.grouptypes -Contains "Unified") -and ($_.ResourceProvisioningOptions -Contains "Team") }
 
 $i = 1
 
